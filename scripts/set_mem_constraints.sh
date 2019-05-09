@@ -5,7 +5,7 @@ set -e
 
 #####################################################################
 ## Portions of this script is copied from:
-## https://github.com/fabric8io-images/java/blob/master/images/jboss/openjdk8/jdk/run-java.sh
+## https://github.com/fabric8io-images/java/blob/14e31db422828a08ae25ff94ce3966b447ea28a8/images/jboss/openjdk8/jdk/run-java.sh
 ## Based on this article:
 ## https://developers.redhat.com/blog/2017/03/14/java-inside-docker/
 ## Thanks to Ross Hendrickson

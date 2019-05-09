@@ -21,6 +21,6 @@ source /usr/local/bin/set-mem-constraints.sh
 
 echo "Launching with java opts: $JAVA_OPTS $yourkit_options"
 exec java -server ${JAVA_OPTS} ${yourkit_options} \
-          -XX:OnError='logger -u /dev/harbour/syslog -p emerg Fatal JVM Error (pid: %p)' \
-          -XX:OnOutOfMemoryError='logger -u /dev/harbour/syslog -p emerg Fatal JVM OutOfMemoryError (pid: %p)' \
+          -XX:OnError='echo "Fatal JVM Error (pid: %p)"' \
+          -XX:OnOutOfMemoryError='echo "Fatal JVM OutOfMemoryError (pid: %p)"' \
           -jar /opt/eva-catalog-server.jar
