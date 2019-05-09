@@ -1,0 +1,54 @@
+;; Copyright 2018-2019 Workiva Inc.
+;; 
+;; Licensed under the Apache License, Version 2.0 (the "License");
+;; you may not use this file except in compliance with the License.
+;; You may obtain a copy of the License at
+;; 
+;;     http://www.apache.org/licenses/LICENSE-2.0
+;; 
+;; Unless required by applicable law or agreed to in writing, software
+;; distributed under the License is distributed on an "AS IS" BASIS,
+;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;; See the License for the specific language governing permissions and
+;; limitations under the License.
+
+(let [broker {:broker-uri (env "EVA_BROKER_HOST" "tcp://activemq:61616")
+              :broker-type "org.apache.activemq.ActiveMQConnectionFactory"
+              :broker-user "eva"
+              :broker-password "eva"
+              :messenger-node-config/type :broker-uri}
+
+      storage (sql-storage {:subprotocol (env "EVA_STORAGE_SQL_DB_TYPE" "mysql")
+                            :subname     (format "//%s:%s/%s"
+                                           (env "EVA_STORAGE_SQL_HOST" "eva-db")
+                                           (env "EVA_STORAGE_SQL_PORT" 3306)
+                                           (env "EVA_STORAGE_SQL_DBNAME" "eva"))
+                            :classname   (env "EVA_STORAGE_SQL_DRIVER" "com.mysql.jdbc.Driver")
+                            :user (env "EVA_STORAGE_SQL_USER" "eva")
+                            :password (env "EVA_STORAGE_SQL_PASSWORD" "notasecret")})
+
+      test-1-partition #uuid"e9de2d72-7d6c-400f-ad40-25450f88eb02"
+      test-2-partition #uuid"167885a0-0114-4f07-92c4-a2e4e8edf829"
+      test-3-partition #uuid "e0e565d2-a9b3-440b-b503-76189f34f743"
+      test-4-partition #uuid "29448193-2df7-4cb4-b23b-a4e559aa30ae"
+
+      test-1-db-id #uuid "f0db54a3-e033-4212-9fb4-cdb269a2da10"
+      test-2-db-id #uuid "4b847129-ae8a-472c-82c2-259bd2a433cc"
+      test-3-db-id #uuid "3abdb14e-1245-4212-ae79-6531c5df718b"
+      test-4-db-id #uuid "51d17d3b-8221-4f24-8bc5-a502de081038"
+
+      test-1-database (database test-1-partition test-1-db-id)
+      test-2-database (database test-2-partition test-2-db-id)
+      test-3-database (database test-3-partition test-3-db-id)
+      test-4-database (database test-4-partition test-4-db-id)]
+
+  (-> (empty-catalog)
+      (add-flat-config "test-tenant-1" "test-category-1" "test-label-1"
+                       (flat-catalog-config broker storage test-1-database))
+      (add-flat-config "test-tenant-2" "test-category-2" "test-label-2"
+                       (flat-catalog-config broker storage test-2-database))
+      (add-flat-config "test-tenant-3" "test-category-3" "test-label-3"
+                       (flat-catalog-config broker storage test-3-database))
+      (add-flat-config "test-tenant-4" "test-category-4" "test-label-4"
+                       (flat-catalog-config broker storage test-4-database))))
+

@@ -1,0 +1,59 @@
+;; Copyright 2018-2019 Workiva Inc.
+;; 
+;; Licensed under the Apache License, Version 2.0 (the "License");
+;; you may not use this file except in compliance with the License.
+;; You may obtain a copy of the License at
+;; 
+;;     http://www.apache.org/licenses/LICENSE-2.0
+;; 
+;; Unless required by applicable law or agreed to in writing, software
+;; distributed under the License is distributed on an "AS IS" BASIS,
+;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;; See the License for the specific language governing permissions and
+;; limitations under the License.
+
+(let [broker (broker-uri (str "tcp://" (env "EVA_BROKER_HOST" "activemq") ":" (env "EVA_BROKER_PORT" "61616")
+                              "?"
+                              "user="
+                              (env "EVA_BROKER_TRANSACTOR_USER" "eva-transactor")
+                              "&"
+                              "password="
+                              (env "EVA_BROKER_TRANSACTOR_PASSWORD" "notasecret")
+                              "&"
+                              "retryInterval="
+                              (env "EVA_BROKER_RETRY_INTERVAL" "1000")
+                              "&"
+                              "retryIntervalMultiplier="
+                              (env "EVA_BROKER_RETRY_INTERVAL_MULTIPLIER", "2.0")
+                              "&"
+                              "maxRetryInterval="
+                              (env "EVA_BROKER_MAX_RETRY_INTERVAL" "60000")
+                              "&"
+                              "reconnectAttempts="
+                              (env "EVA_BROKER_RECONNECT_ATTEMPTS" "-1")))
+
+      storage (sql-storage {:subprotocol (env "EVA_STORAGE_SQL_DB_TYPE" "mysql")
+                            :subname     (format "//%s:%s/%s"
+                                                 (env "EVA_STORAGE_SQL_HOST" "localhost")
+                                                 (env "EVA_STORAGE_SQL_PORT" 3306)
+                                                 (env "EVA_STORAGE_SQL_DBNAME" "eva"))
+                            :classname   (env "EVA_STORAGE_SQL_DRIVER" "com.mysql.jdbc.Driver")
+                            :user (env "EVA_STORAGE_SQL_USER" "sa")
+                            :password (env "EVA_STORAGE_SQL_PASSWORD" "notasecret")})
+
+      partition-1 #uuid"63621540-10fc-402a-b305-97f312d0f8f0"
+
+      database-1 (database partition-1 #uuid"cad72d3a-3af7-4111-9d68-03c75102486d")
+      database-2 (database partition-1 #uuid"b3923f98-cae5-4503-a572-f19a1f261fb0")
+      database-3 (database partition-1 #uuid"eaf51494-0032-4381-971a-7946b012724c")
+      database-4 (database partition-1 #uuid"f998bc77-c090-4c3a-b86e-1b063536bcf3")]
+
+  (-> (empty-catalog)
+      (add-flat-config "workiva" "eva-test-1" "test-db-1" (flat-catalog-config broker storage database-1))
+      (add-flat-config "workiva" "eva-test-1" "test-db-2" (flat-catalog-config broker storage database-2))
+      (add-flat-config "workiva" "eva-test-2" "test-db-3" (flat-catalog-config broker storage database-3))
+      (add-flat-config "workiva" "eva-test-2" "test-db-4" (flat-catalog-config broker storage database-4))
+      (assign-transactor-group "category:eva-test-1"
+                               {:category "eva-test-1"})
+      (assign-transactor-group "category:eva-test-2;label:test-db-3"
+                               {:category "eva-test-2", :label "test-db-3"})))

@@ -1,0 +1,17 @@
+name: smoke-test
+
+image: drydock.workiva.net/workiva/skynet-images:docker-compose_1.21.0-latest
+
+requires:
+  Workiva/eva-catalog: docker
+
+scripts:
+  - ./functional-testing/skynet/smoke_test.sh
+
+artifacts:
+ - logs/
+
+run:
+  source: shipyard
+
+timeout: moderate

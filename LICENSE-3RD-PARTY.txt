@@ -1,0 +1,21 @@
+-----------------------------------------------------------------------------
+This program uses scripts from fabric8io-images/java which is
+distributed under the Apache 2.0 license.
+
+fabric8io-images/java
+Copyright 2009-2010 Roland Huss
+The included license can be found here:
+
+    https://github.com/fabric8io-images/java/blob/master/LICENSE
+
+-----------------------------------------------------------------------------
+This program uses implementation from ring-clojure/ring which is
+distributed under the MIT License.
+
+ring-clojure/ring
+Copyright (c) 2009-2010 Mark McGranaghan
+Copyright (c) 2009-2018 James Reeves
+The included license can be found here:
+
+    https://github.com/ring-clojure/ring/blob/master/LICENSE
+
