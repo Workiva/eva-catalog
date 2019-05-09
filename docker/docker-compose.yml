@@ -1,0 +1,8 @@
+version: '3.6'
+services:
+  eva-catalog:
+    image: ${SKYNET_APPLICATION_EVA_CATALOG:-drydock.workiva.net/workiva/eva-catalog:latest-release}
+    environment:
+      - EVA_CATALOG_DATA=/local-catalog-config.edn
+    healthcheck:
+      test: wget -q -O - http://eva-catalog:3000/status || exit 1
