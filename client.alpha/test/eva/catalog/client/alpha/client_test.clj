@@ -144,7 +144,6 @@
 (def eva-test-2-labels
   #{test-db-3-config test-db-4-config})
 
-
 ;; Lifted from ring.adapter.jetty testing
 ;; https://github.com/ring-clojure/ring/blob/master/ring-jetty-adapter/test/ring/adapter/test/jetty.clj
 (defmacro with-server [app options & body]
