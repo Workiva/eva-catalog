@@ -6,7 +6,7 @@ requires:
   Workiva/eva-catalog: docker
 
 scripts:
-  - ./functional-testing/skynet/smoke_test.sh
+  - ./integration-testing/skynet/smoke_test.sh
 
 artifacts:
  - logs/
