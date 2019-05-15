@@ -4,11 +4,11 @@ set -ex
 
 docker-compose \
     -f ./docker/docker-compose.yml \
-    -f ./functional-testing/skynet/docker-compose.skynet.override.yml \
+    -f ./integration-testing/skynet/docker-compose.skynet.override.yml \
     up -d
 docker-compose \
     -f ./docker/docker-compose.yml \
-    -f ./functional-testing/skynet/docker-compose.skynet.override.yml logs \
+    -f ./integration-testing/skynet/docker-compose.skynet.override.yml logs \
     -f eva-catalog > logs/eva-catalog.log 2>&1 &
 
 wget -q -O /dev/stdout \

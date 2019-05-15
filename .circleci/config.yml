@@ -58,23 +58,6 @@ jobs:
       - run: rm -rf ./workivabuild/prefetch-deps
       - run: lein modules cljfmt check
 
-  verify_docs:
-    docker:
-      - image: circleci/clojure:lein-2.8.3-node
-    working_directory: ~/build
-    steps:
-      - restore_cache:
-          keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-            - v1-dependencies-{{ checksum "project.clj" }}
-            - v1-node-dependencies-{{ checksum "package.json" }}
-      - run: ./.circleci/scripts/verify-docs.sh
-      - run: cd ./documentation && tar cvfz "../eva-catalog-docs.tgz" ./
-      - run: mkdir -p ./artifacts/docs
-      - run: mv ./eva-catalog-docs.tgz ./artifacts/docs/
-      - store_artifacts:
-          path: ./artifacts
-
   verify_license_headers:
     docker:
       - image: circleci/clojure:lein-2.8.3
@@ -87,7 +70,7 @@ jobs:
       - run: ./.circleci/scripts/verify-license-headers.sh "clj" "^;; Copyright 2018-[0-9]{4} Workiva Inc.$" project.clj profiles.clj
       - run: ./.circleci/scripts/verify-license-headers.sh "java" "^// Copyright 2018-[0-9]{4} Workiva Inc.$"
 
-  unit_tests:
+  build_and_test_and_verify_docs:
     docker:
       - image: circleci/clojure:lein-2.8.3
     working_directory: ~/build
@@ -96,22 +79,17 @@ jobs:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
             - v1-dependencies-{{ checksum "project.clj" }}
+            - v1-node-dependencies-{{ checksum "package.json" }}
+      # Install / Test
       - run: rm -rf ./workivabuild/prefetch-deps
-      - run: lein modules test
-
-  build_jars:
-    docker:
-      - image: circleci/clojure:lein-2.8.3
-    working_directory: ~/build
-    steps:
-      - restore_cache:
-          keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-            - v1-dependencies-{{ checksum "project.clj" }}
-      - run: rm -rf ./workivabuild/prefetch-deps
-      - run: lein modules install
+      - run: lein modules do test, install
       - run: mkdir -p ./artifacts/jars
-      - run: mv ./target/*.jar ./artifacts/jars/
+      - run: mv ./**/target/*.jar ./artifacts/jars/
+      # Verify Docs
+      - run: ./.circleci/scripts/verify-docs.sh
+      - run: cd ./documentation && tar cvfz "../eva-catalog-docs.tgz" ./
+      - run: mkdir -p ./artifacts/docs
+      - run: mv ./eva-catalog-docs.tgz ./artifacts/docs/
       - store_artifacts:
           path: ./artifacts
 
@@ -140,7 +118,7 @@ jobs:
             - v1-dependencies-{{ checksum "project.clj" }}
       - run: mkdir -p ~/.lein
       - run: cp ./.circleci/clojars/profiles.clj ~/.lein/profiles.clj
-      - run: lein modules "client.alpha:common.alpha" deploy clojars
+      - run: lein modules "common.alpha:client.alpha" deploy clojars
 
 workflows:
   eva_catalog_workflow:
@@ -175,31 +153,18 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - verify_docs:
+      - build_and_test_and_verify_docs:
           requires:
             - bundle_dependencies
-          filters:
-            tags:
-              only: /.*/
-      - unit_tests:
-          requires:
-            - bundle_dependencies
-          filters:
-            tags:
-              only: /.*/
-      - build_jars:
-          requires:
             - verify_license_headers
             - lint_code
-            - verify_docs
-            - unit_tests
           filters:
             tags:
               only: /.*/
       - deploy_clojars:
           context: Clojars
           requires:
-            - build_jar
+            - build_and_test_and_verify_docs
             - verify_docker_build
           # Only run on tagged builds starting with 'v'
           # Therefore, releases MUST start with 'v'
