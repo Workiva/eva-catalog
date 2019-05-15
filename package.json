@@ -1,0 +1,22 @@
+{
+  "name": "eva-catalog",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Workiva/eva-catalog.git"
+  },
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/Workiva/eva-catalog/issues"
+  },
+  "homepage": "https://github.com/Workiva/eva-catalog#readme",
+  "dependencies": {
+    "markdown-toc": "^1.2.0"
+  }
+}

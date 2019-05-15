@@ -20,10 +20,14 @@ COPY . /build_modules/
 
 ### Remove workivabuild/prefetch project
 RUN rm -rf ./workivabuild/prefetch-deps
-### Test and install modules in dependency order
-RUN lein modules do test, install
+### Lint, Test and install modules in dependency order
+RUN lein modules do cljfmt check, test, install
 ### Capture all jars that are produced in all modules
 ARG BUILD_ARTIFACTS_JAVA=/build_modules/**/target/*.jar
+
+### Build Documentation
+RUN cd ./documentation && tar cvfz "../eva-catalog-docs.tgz" ./
+ARG BUILD_ARTIFACTS_DOCUMENTATION=/build_modules/eva-catalog-docs.tgz
 
 # * Build Server Phase
 FROM clojure:openjdk-8-lein-2.8.3-alpine as build_server

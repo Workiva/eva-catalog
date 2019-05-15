@@ -11,3 +11,9 @@ run-docker:
 		-v ${PWD}/common.alpha/test-data/eva/catalog/common/alpha:/shared \
 		--name eva-catalog-local \
 		eva-catalog:local
+
+update-tocs:
+	./.circleci/scripts/update-tocs.sh
+
+docs:
+	lein modules :dirs "client.alpha:common.alpha:server.alpha" docs
