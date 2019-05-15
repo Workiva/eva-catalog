@@ -1,4 +1,4 @@
-(defproject com.workiva.eva.catalog/client.alpha "2.0.0"
+(defproject com.workiva.eva.catalog/client.alpha "2.0.1"
   :description "Client to the Eva Catalog Service"
   :plugins [[lein-modules "0.3.11"]
             [lein-cljfmt "0.6.4"]

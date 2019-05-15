@@ -1,4 +1,4 @@
-(defproject com.workiva.eva/catalog-parent "2.0.0"
+(defproject com.workiva.eva/catalog-parent "2.0.1"
   :plugins [[lein-modules "0.3.11"]
             [lein-cljfmt "0.6.4"]]
 
