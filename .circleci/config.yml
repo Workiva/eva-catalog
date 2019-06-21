@@ -140,10 +140,10 @@ jobs:
           at: /tmp/workspace
       - run: mkdir -p ./server.alpha/target/
       - run: mv /tmp/workspace/server.alpha.jar ./server.alpha/target/server.alpha.jar
-      - run: docker build -f catalog.Dockerfile -t workivadocker/eva-catalog:latest-release .
-      # - run: docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
-      # - run: docker push workivadocker/eva-catalog:latest-release
-      # - run: docker push workivadocker/eva-catalog:$CIRCLE_TAG
+      - run: docker build -f catalog.Dockerfile -t workivadocker/eva-catalog:latest-release -t workivadocker/eva-catalog:$CIRCLE_TAG .
+      - run: docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+      - run: docker push workivadocker/eva-catalog:latest-release
+      - run: docker push workivadocker/eva-catalog:$CIRCLE_TAG
 
 workflows:
   eva_catalog_workflow:
@@ -207,4 +207,6 @@ workflows:
           # Therefore, releases MUST start with 'v'
           filters:
             tags:
-              only: /.*/
+              only: /^v.*/
+            branches:
+              ignore: /.*/
