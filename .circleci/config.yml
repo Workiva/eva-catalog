@@ -85,6 +85,8 @@ jobs:
       - run: lein modules do test, install
       - run: mkdir -p ./artifacts/jars
       - run: mv ./**/target/*.jar ./artifacts/jars/
+      # Persist Server JAR
+      - run: cp ./artifacts/jars/server.alpha*.jar /tmp/server.alpha.jar
       # Verify Docs
       - run: ./.circleci/scripts/verify-docs.sh
       - run: cd ./documentation && tar cvfz "../eva-catalog-docs.tgz" ./
@@ -92,6 +94,10 @@ jobs:
       - run: mv ./eva-catalog-docs.tgz ./artifacts/docs/
       - store_artifacts:
           path: ./artifacts
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - server.alpha.jar
 
   # Verify that internal CI system will not fail after a merged PR
   verify_docker_build:
@@ -119,6 +125,25 @@ jobs:
       - run: mkdir -p ~/.lein
       - run: cp ./.circleci/clojars/profiles.clj ~/.lein/profiles.clj
       - run: lein modules :dirs "common.alpha:client.alpha" deploy clojars
+
+  build_and_push_docker_image:
+    docker:
+      - image: circleci/clojure:lein-2.8.3
+    working_directory: ~/build
+    steps:
+      - restore_cache:
+          keys:
+            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: mkdir -p ./server.alpha/target/
+      - run: mv /tmp/workspace/server.alpha.jar ./server.alpha/target/server.alpha.jar
+      - run: docker build -f catalog.Dockerfile -t workivadocker/eva-catalog:latest-release -t workivadocker/eva-catalog:$CIRCLE_TAG .
+      # - run: docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
+      # - run: docker push workivadocker/eva-catalog:latest-release
+      # - run: docker push workivadocker/eva-catalog:$CIRCLE_TAG
 
 workflows:
   eva_catalog_workflow:
@@ -173,3 +198,13 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+      - build_and_push_docker_image:
+          context: DockerHub
+          requires:
+            - verify_docker_build
+            - build_and_test_and_verify_docs
+          # Only run on tagged builds starting with 'v'
+          # Therefore, releases MUST start with 'v'
+          filters:
+            tags:
+              only: /.*/
