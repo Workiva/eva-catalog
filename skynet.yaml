@@ -12,5 +12,7 @@ artifacts:
  - logs/
 
 run:
+  on-pull-request: true
+  when-branch-name-is: .+
 
 timeout: moderate
