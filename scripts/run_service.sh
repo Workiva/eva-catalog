@@ -17,7 +17,7 @@ if [ "$YOURKIT_FLAG" == true ] ; then
 fi
 
 # Set Java Memory Constraints
-source /usr/local/bin/set-mem-constraints.sh
+source /usr/local/bin/set_mem_constraints.sh
 
 echo "Launching with java opts: $JAVA_OPTS $yourkit_options"
 exec java -server ${JAVA_OPTS} ${yourkit_options} \
