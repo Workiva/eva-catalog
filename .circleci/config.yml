@@ -72,7 +72,7 @@ jobs:
 
   build_and_test_and_verify_docs:
     docker:
-      - image: circleci/clojure:lein-2.8.3
+      - image: circleci/clojure:lein-2.8.3-node
     working_directory: ~/build
     steps:
       - restore_cache:
@@ -142,7 +142,7 @@ jobs:
           at: /tmp/workspace
       - run: mkdir -p ./server.alpha/target/
       - run: mv /tmp/workspace/eva-catalog-server.jar ./server.alpha/target/eva-catalog-server.jar
-      - run: docker build -f catalog.Dockerfile -t workivadocker/eva-catalog:test # TEMP ! -t workivadocker/eva-catalog:latest-release -t workivadocker/eva-catalog:$CIRCLE_TAG .
+      - run: docker build -f catalog.Dockerfile -t workivadocker/eva-catalog:test . # TEMP ! -t workivadocker/eva-catalog:latest-release -t workivadocker/eva-catalog:$CIRCLE_TAG .
       - run: docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
       - run: docker push workivadocker/eva-catalog:test
       # TEMP!
