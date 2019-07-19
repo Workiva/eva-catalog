@@ -9,7 +9,7 @@ RUN apk add --update bash nss
 
 # Copy over jar and required scripts
 WORKDIR /opt
-COPY ./server.alpha/target/server.alpha*.jar /opt/
+COPY ./server.alpha/target/eva-catalog-server.jar /opt/
 COPY ./scripts/run_service.sh /usr/local/bin/run_service.sh
 COPY ./scripts/set_mem_constraints.sh /usr/local/bin/set_mem_constraints.sh
 

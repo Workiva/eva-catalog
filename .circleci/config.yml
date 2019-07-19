@@ -72,7 +72,7 @@ jobs:
 
   build_and_test_and_verify_docs:
     docker:
-      - image: circleci/clojure:lein-2.8.3
+      - image: circleci/clojure:lein-2.8.3-node
     working_directory: ~/build
     steps:
       - restore_cache:
@@ -83,11 +83,12 @@ jobs:
       # Install / Test
       - run: rm -rf ./workivabuild/prefetch-deps
       - run: lein modules do test, install
+      # Build Uberjar for Final Docker Image
       - run: lein modules :dirs server.alpha uberjar
       - run: mkdir -p ./artifacts/jars
       - run: mv ./**/target/*.jar ./artifacts/jars/
       # Persist Server JAR
-      - run: cp ./artifacts/jars/server.alpha*.jar /tmp/server.alpha.jar
+      - run: cp ./artifacts/jars/eva-catalog-server.jar /tmp/eva-catalog-server.jar
       # Verify Docs
       - run: ./.circleci/scripts/verify-docs.sh
       - run: cd ./documentation && tar cvfz "../eva-catalog-docs.tgz" ./
@@ -98,7 +99,7 @@ jobs:
       - persist_to_workspace:
           root: /tmp
           paths:
-            - server.alpha.jar
+            - eva-catalog-server.jar
 
   # Verify that internal CI system will not fail after a merged PR
   verify_docker_build:
@@ -140,7 +141,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: mkdir -p ./server.alpha/target/
-      - run: mv /tmp/workspace/server.alpha.jar ./server.alpha/target/server.alpha.jar
+      - run: mv /tmp/workspace/eva-catalog-server.jar ./server.alpha/target/eva-catalog-server.jar
       - run: docker build -f catalog.Dockerfile -t workivadocker/eva-catalog:latest-release -t workivadocker/eva-catalog:$CIRCLE_TAG .
       - run: docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS
       - run: docker push workivadocker/eva-catalog:latest-release
