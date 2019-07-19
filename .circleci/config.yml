@@ -83,6 +83,7 @@ jobs:
       # Install / Test
       - run: rm -rf ./workivabuild/prefetch-deps
       - run: lein modules do test, install
+      - run: lein modules :dirs server.alpha uberjar
       - run: mkdir -p ./artifacts/jars
       - run: mv ./**/target/*.jar ./artifacts/jars/
       # Persist Server JAR
