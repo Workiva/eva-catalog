@@ -1,4 +1,4 @@
-(defproject com.workiva.eva.catalog/common.alpha "2.0.4"
+(defproject com.workiva.eva.catalog/common.alpha "2.0.5"
   :plugins [[lein-modules "0.3.11"]
             [lein-cljfmt "0.6.4"]
             [lein-codox "0.10.3"]
